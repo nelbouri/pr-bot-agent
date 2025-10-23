@@ -1,0 +1,67 @@
+import requests
+from typing import Dict, List
+
+
+class GitHubClient:
+    """Simple GitHub API client."""
+    
+    BASE_URL = "https://api.github.com"
+    
+    def __init__(self, token: str):
+        """Initialize client with GitHub token."""
+        self.token = token
+        self.headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+    
+    def get_pr(self, repo: str, pr_number: int) -> Dict:
+        """Get PR details.
+        
+        Args:
+            repo: Repository in format "owner/repo"
+            pr_number: PR number
+            
+        Returns:
+            PR data as dictionary
+        """
+        url = f"{self.BASE_URL}/repos/{repo}/pulls/{pr_number}"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_pr_files(self, repo: str, pr_number: int) -> List[Dict]:
+        """Get files changed in PR.
+        
+        Args:
+            repo: Repository in format "owner/repo"
+            pr_number: PR number
+            
+        Returns:
+            List of file change objects
+        """
+        url = f"{self.BASE_URL}/repos/{repo}/pulls/{pr_number}/files"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+    
+    def post_pr_comment(self, repo: str, pr_number: int, body: str) -> str:
+        """Post a comment on a PR.
+        
+        Args:
+            repo: Repository in format "owner/repo"
+            pr_number: PR number
+            body: Comment text (markdown supported)
+            
+        Returns:
+            URL of the created comment
+        """
+        url = f"{self.BASE_URL}/repos/{repo}/issues/{pr_number}/comments"
+        response = requests.post(
+            url,
+            headers=self.headers,
+            json={"body": body}
+        )
+        response.raise_for_status()
+        return response.json()["html_url"]
+
