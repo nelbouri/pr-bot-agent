@@ -8,6 +8,7 @@ permissions:
   pull-requests: write
   issues: write
 
+
 jobs:
   review:
     runs-on: ubuntu-latest
@@ -33,3 +34,4 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         COMMENT_STYLE: funny
       run: pr-bot
+
